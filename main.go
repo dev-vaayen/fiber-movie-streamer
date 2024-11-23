@@ -35,3 +35,21 @@ func StreamFilm(c *fiber.Ctx) error {
 	return c.SendFile(fp)
 }
 
+
+//// minimalistic but bad version
+//package main
+//
+//import "github.com/gofiber/fiber/v2"
+//
+//func main() {
+//	app := fiber.New()
+//	app.Get("/stream/:name", streamFunc)
+//	app.Listen(":8000")
+//}
+//
+//func streamFunc(c *fiber.Ctx) error {
+//	fileName := c.Params("name")
+//	filePath := "./films/" + fileName + ".mp4"
+//	c.Context().SetContentType("video/mp4")
+//	return c.SendFile(filePath)
+//}
