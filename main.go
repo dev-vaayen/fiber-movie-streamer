@@ -5,34 +5,32 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
-
 func main() {
-	r := gin.Default()
-	r.GET("/films/:name", StreamFilm)
+	app := fiber.New()
 
-	r.Run(":8000")
+	app.Get("/films/:name", StreamFilm)
+
+	app.Listen(":8000")
 }
 
-func StreamFilm(c *gin.Context) {
+func StreamFilm(c *fiber.Ctx) error {
 	filmDir := "./films"
+	f := c.Params("name")
 
-	f := c.Param("name")
 	if f == "" {
-		c.JSON(400, gin.H{"error": "filname field required in params"})
-		return
+		return c.Status(400).JSON(fiber.Map{"error": "filename field required in params"})
 	}
 
 	fp := filepath.Join(filmDir, f+".mp4")
 	fmt.Println(fp)
+
 	if _, err := os.Stat(fp); os.IsNotExist(err) {
-		c.JSON(404, gin.H{"error": "Movie does not exist"})
-		return 
+		return c.Status(404).JSON(fiber.Map{"error": "Movie does not exist"})
 	}
 
-	c.Header("Content-Type", "video/mp4")
-	c.File(fp)
-
+	c.Set("Content-Type", "video/mp4")
+	return c.SendFile(fp)
 }
